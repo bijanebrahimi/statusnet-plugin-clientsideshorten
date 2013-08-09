@@ -40,37 +40,47 @@
         return longestWord;
     }
 
-    function shorten()
+    function shorten(element)
     {
-        var $noticeDataText = $('#'+SN.C.S.NoticeDataText);
-        var noticeText = $noticeDataText.val();
-
-        if(noticeText.length > maxNoticeLength || longestWordInString(noticeText) > maxUrlLength) {
-            var original = $noticeDataText.val();
-            shortenAjax = $.ajax({
-                url: $('address .url')[0].href+'/plugins/ClientSideShorten/shorten',
-                data: { text: $noticeDataText.val() },
-                dataType: 'text',
-                success: function(data) {
-                    if(original == $noticeDataText.val()) {
-                        $noticeDataText.val(data).keyup();
+        // 
+        var noticeText = $(element).val();
+        var regex = /(((https?|ftps?|mms|rtsp|gopher|news|nntp|telnet|wais|file|prospero|webcal|irc)|(mailto|aim|tel|xmpp)):\/\/[^ ]+)/g
+        var noticeTextURLs = noticeText.match(regex)
+        console.log('begins', noticeText, noticeTextURLs)
+        if (!noticeTextURLs)
+            return null
+        for(var index=0; index<noticeTextURLs.length; index++){
+            var noticeTextURL = noticeTextURLs[index]
+            console.log('found', noticeTextURL, index)
+            if(noticeText.length > maxNoticeLength || noticeTextURL > maxUrlLength) {
+                console.log('posting', noticeTextURL, index)
+                shortenAjax = $.ajax({
+                    // There should be a better way to get the SN base URL
+                    url: $('address .url')[0].href+'/plugins/ClientSideShorten/shorten',
+                    data: { text: noticeTextURL },
+                    dataType: 'json',
+                    success: function(data) {
+                        var noticeDataTextNew = $(element).val()
+                        var noticeDataTextNew = noticeDataTextNew.replace(data[0], data[1])
+                        $(element).val(noticeDataTextNew).keyup()
                     }
-                }
-            });
+                });
+            }
         }
     }
 
     $(document).ready(function(){
-        $noticeDataText = $('#'+SN.C.S.NoticeDataText);
-        $noticeDataText.smartkeypress(function(e){
+        var noticeDataText = $('.notice_data-text');
+        $(noticeDataText).smartkeypress(function(e){
             //if(typeof(shortenAjax) !== 'undefined') shortenAjax.abort();
+            console.log('triggered', $(this).val())
             if(e.charCode == '32') {
-                shorten();
+                shorten(this);
             }
         });
-        $noticeDataText.bind('paste', function() {
+        $(noticeDataText).bind('paste', function() {
             //if(typeof(shortenAjax) !== 'undefined') shortenAjax.abort();
-            setTimeout(shorten,1);
+            setTimeout(shorten(this),1);
         });
     });
 

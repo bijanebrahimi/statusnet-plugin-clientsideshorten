@@ -2,7 +2,7 @@
 /**
  * StatusNet, the distributed open-source microblogging tool
  *
- * List users for autocompletion
+ * shorten URLs from client side
  *
  * PHP version 5
  *
@@ -22,6 +22,7 @@
  * @category  Plugin
  * @package   StatusNet
  * @author    Craig Andrews <candrews@integralblue.com>
+ * @author    Bijan Ebrahimi <bijanebrahimi@lavabit.com.com>
  * @copyright 2008-2009 StatusNet, Inc.
  * @copyright 2009 Free Software Foundation, Inc http://www.fsf.org
  * @license   http://www.fsf.org/licensing/licenses/agpl-3.0.html GNU Affero General Public License version 3.0
@@ -63,6 +64,6 @@ class ShortenAction extends Action
         parent::handle($args);
         header('Content-Type: text/plain');
         $shortened_text = common_shorten_links($this->text);
-        print $shortened_text;
+        print json_encode([$this->text, $shortened_text]);
     }
 }
