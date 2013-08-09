@@ -46,14 +46,11 @@
         var noticeText = $(element).val();
         var regex = /(((https?|ftps?|mms|rtsp|gopher|news|nntp|telnet|wais|file|prospero|webcal|irc)|(mailto|aim|tel|xmpp)):\/\/[^ ]+)/g
         var noticeTextURLs = noticeText.match(regex)
-        console.log('begins', noticeText, noticeTextURLs)
         if (!noticeTextURLs)
             return null
         for(var index=0; index<noticeTextURLs.length; index++){
             var noticeTextURL = noticeTextURLs[index]
-            console.log('found', noticeTextURL, index)
             if(noticeText.length > maxNoticeLength || noticeTextURL > maxUrlLength) {
-                console.log('posting', noticeTextURL, index)
                 shortenAjax = $.ajax({
                     // There should be a better way to get the SN base URL
                     url: $('address .url')[0].href+'/plugins/ClientSideShorten/shorten',
@@ -73,7 +70,6 @@
         var noticeDataText = $('.notice_data-text');
         $(noticeDataText).smartkeypress(function(e){
             //if(typeof(shortenAjax) !== 'undefined') shortenAjax.abort();
-            console.log('triggered', $(this).val())
             if(e.charCode == '32') {
                 shorten(this);
             }
